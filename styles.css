@@ -134,8 +134,9 @@ table tr:nth-child(n+2) td{
     width: 50%;
 }
 
-td{
+td, th{
     vertical-align: top;
+    text-align: left;
 }
 
 li{

@@ -1,9 +1,68 @@
+const viewFactory = {
+
+    colClasses: {
+        "Education": ["col-md-20", "col-md-50", "col-md-20", "col-md-10"],
+        "Skills": ["col-md-40", "col-md-60"],
+        "Intern": ["col-md-20", "col-md-60", "col-md-20"],
+        "Projects": ["col-md-20", "col-md-60", "col-md-20"],
+        "Responsibility": ["col-md-50"],
+        "Hobbies": ["col-md-50"]
+    },
+    
+    formLableNames: {
+        'Personal': {columns: [{rows: ['']}, {rows: ['Institute: ']}, {rows: ['Email: ']}, {rows: ['DOB: ']}, {rows: ['Address: ']}]},
+        'Education': {columns: [{rows: ['Degree: ']}, {rows: ['University: ']}, {rows: ['Year: ']}, {rows: ['Cpi: ']}]},
+        'Skills': {columns: [{rows: ['Expertise: ']}, {rows: ['YourExpertise: ']}]},
+        'Intern': {columns: [{rows: ['Intern: ']}, {rows: ['InternInfo: ']}, {rows: ['InternDuration: ', 'Team: ']}]},
+        'Projects': {columns: [{rows: ['Project: ', 'Guide: ']}, {rows: ['ProjectInfo: ']}, {rows: ['ProjectDuration: ', 'Team: ']}]},
+        'Responsibility': {columns: [{rows: ['Pos: ']}]},
+        'Hobbies': {columns: [{rows: ['Hobby: ']}]},
+    },
+
+    formInputClass: {
+        'Personal': {columns: [{rows: ['Name']}, {rows: ['Institute']}, {rows: ['Email']}, {rows: ['DOB']}, {rows: ['Address']}]},
+        'Education': {columns: [{rows: ['Degree']}, {rows: ['University']}, {rows: ['Year']}, {rows: ['Cpi']}]},
+        'Skills': {columns: [{rows: ['Expertise']}, {rows: ['YourExpertise']}]},
+        'Intern': {columns: [{rows: ['Intern']}, {rows: ['InternInfo']}, {rows: ['InternDuration', 'Team']}]},
+        'Projects': {columns: [{rows: ['Project', 'Guide']}, {rows: ['ProjectInfo']}, {rows: ['ProjectDuration', 'Team']}]},
+        'Responsibility': {columns: [{rows: ['Pos']}]},
+        'Hobbies': {columns: [{rows: ['Hobby']}]},
+    },
+
+    headings: {
+        'Education': ['Degree', 'University/Institute', 'Year', 'Cpi'], 
+    },
+
+    tags: {
+        'Personal': ['h1', 'h3', 'h3', 'h3', 'h3'],
+    },
+
+    isStatic: {
+        'Personal': true,
+        'Education': false,
+        'Skills': false,
+        'Intern': false,
+        'Projects': false,
+        'Responsibility': false,
+        'Hobbies': false,
+    },
+
+    doesHaveABorder: {
+        'Personal': true,
+        'Education': true,
+        'Skills': true,
+        'Intern': true,
+        'Projects': true,
+        'Responsibility': false,
+        'Hobbies': false,
+    },
+}
 class Model {
     constructor()
     {
         this.lists = {
             "Personal": [[["Solanki Abhishek Priyakant"], ["Dhirubhai Ambani Institute of Information and Communication Technology"], ["201801088@daiict.ac.in"], ["May 1,2000"], ["48-B,Maruti Park Society,80 feet road,Surendranagar"]]],
-            "Education": [[["Degree"], ["University/Institute"], ["Year"], ["Cpi/Aggregate"]], [["B.Tech | ICT"], ["Dhirubhai Ambani Institute of Information and Communication Technology"], ["2018-2022"], ["7.25"]], [["Higher Secondary | Class XII"], ["Shree Sardar Patel Vidhyalaya"], ["2016-2017"], ["90%"]],
+            "Education": [[["B.Tech | ICT"], ["Dhirubhai Ambani Institute of Information and Communication Technology"], ["2018-2022"], ["7.25"]], [["Higher Secondary | Class XII"], ["Shree Sardar Patel Vidhyalaya"], ["2016-2017"], ["90%"]],
                 [["Secondary | Class X"], ["Shree Sardar Patel Vidhyalaya"], ["2014-2015"], ["91.5%"]]],
             "Skills": [[["Expertise Area/Area(s) of Interest"], ["Data Structures and Algorithms"]], [["Programming Language(s)"], ["C, C++, Javascript"]], [["Tools and Technologies"], ["Ltspice"]]],
             "Intern": [[["Rural Internship"], ["Vanvasi Kalyan Ashram, Rajasthan. We went to kotda and visited nearby villages and taught 8th std. children and also gave guidance to children. We visited local areas and observed their lifestyle. Guide: Vanvasi Kalyan Ashram Staff"], ["5 Dec 2019- 27 Dec 2019.", "Team Size - 12"]]],
@@ -17,28 +76,25 @@ class Model {
     }
 
     bindChanged(callback){
-        this.changed = callback;
+        this.onChange = callback;
     }
 
     addContent(sectionName, newContentToBeAdded){
         this.lists[sectionName].push(newContentToBeAdded);
 
-        this.changed(this.lists);
+        this.onChange(this.lists);
     }
 
     deleteContent(sectionName, indexOfContentToBeDeleted){
         this.lists[sectionName].splice(indexOfContentToBeDeleted, 1);
 
-        this.changed(this.lists);
+        this.onChange(this.lists);
     }
 
     updateContent(sectionName, updatedRow, indexOfContentToBeUpdated){
-        // if(sectionName === "Education") indexOfContentToBeUpdated += 1;
-        // this.lists[sectionName][indexOfContentToBeUpdated] = updatedRow;
-
         this.lists[sectionName] = this.lists[sectionName].map((element, mapIndex) => mapIndex === indexOfContentToBeUpdated ? this.lists[sectionName][mapIndex] = updatedRow : element);
 
-        this.changed(this.lists);
+        this.onChange   (this.lists);
     }
 }
 
@@ -48,89 +104,61 @@ class View {
         this.form = this.getElement(".forms");
         this.container = this.getElement(".containerCustom");
 
-        this.personalForms = this.getElement(".personalForms");
-        this.educationForms = this.getElement(".educationForms");
-        this.skillForms = this.getElement(".skillsForms");
-        this.internForms = this.getElement(".internForms");
-        this.projectForms = this.getElement(".projectsForms");
-        this.posForms = this.getElement(".responsibilityForms");
-        this.hobbyForms = this.getElement(".hobbiesForms");
-
-        this.personalSection = this.createElement("div", ["personalSection", "padding", "newFlexBox"]);
-        this.educationSection = this.createElement("div", ["educationSection", "padding"]);
-        this.skillSection = this.createElement("div", ["skillSection", "padding"]);
-        this.internSection = this.createElement("div", ["internSection", "padding"]);
-        this.projectSection = this.createElement("div", ["projectSection", "padding"]);
         this.posAndHobbySection = this.createElement("div", ["posAndHobbySection", "padding", "mainFlexBox"]);
 
         this.sectionsAndDivs = {
-            "Personal": this.personalSection,
-            "Education": this.educationSection,
-            "Skills": this.skillSection,
-            "Intern": this.internSection,
-            "Projects": this.projectSection,
+            "Personal": this.createElement("div", ["personalSection", "padding", "newFlexBox"]),
+            "Education": this.createElement("div", ["educationSection", "padding"]),
+            "Skills": this.createElement("div", ["skillSection", "padding"]),
+            "Intern": this.createElement("div", ["internSection", "padding"]),
+            "Projects": this.createElement("div", ["projectSection", "padding"]),
             "Responsibility": this.posAndHobbySection,
             "Hobbies": this.posAndHobbySection
         }
 
         this.sectionsAndForms = {
-            "Personal": this.personalForms,
-            "Education": this.educationForms,
-            "Skills": this.skillForms,
-            "Intern": this.internForms,
-            "Projects": this.projectForms,
-            "Responsibility": this.posForms,
-            "Hobbies": this.hobbyForms
+            "Personal": this.getElement(".personalForms"),
+            "Education": this.getElement(".educationForms"),
+            "Skills": this.getElement(".skillsForms"),
+            "Intern": this.getElement(".internForms"),
+            "Projects": this.getElement(".projectsForms"),
+            "Responsibility": this.getElement(".responsibilityForms"),
+            "Hobbies": this.getElement(".hobbiesForms"),
         }
 
-        this.factory = {
+        const dummy = viewFactory;
 
-            colClasses: {
-                "Education": ["col-md-20", "col-md-50", "col-md-20", "col-md-10"],
-                "Skills": ["col-md-40", "col-md-60"],
-                "Intern": ["col-md-20", "col-md-60", "col-md-20"],
-                "Projects": ["col-md-20", "col-md-60", "col-md-20"],
-                "Responsibility": ["col-md-50"],
-                "Hobbies": ["col-md-50"]
+        this.sectionMapping = {
+            ...dummy,
+            type: {
+                'Personal': this.createPersonalSection,
+                'Education': this.createTable,
+                'Skills': this.createTable,
+                'Intern': this.createTable,
+                'Projects': this.createTable,
+                'Responsibility': this.createUnorderedLists,
+                'Hobbies': this.createUnorderedLists,
             },
-
-            formLableNames: {
-                "Personal": [['Name: '], ['Institute: '], ['Email: '], ['DOB: '], ['Address: ']],
-                "Education": [['Degree: '], ['University: '], ['Year: '], ['Cpi: ']],
-                "Skills": [['Expertise: '], ['Your Expertise: ']],
-                "Intern": [['Intern: '], ['InternInfo: '], ['InternDuration: ', 'Team: ']],
-                "Projects": [['Project: ', 'Guide: '], ['ProjectInfo: '], ['ProjectDuration: ', 'Team: ']],
-                "Responsibility": [['Pos: ']],
-                "Hobbies": [['Hobby: ']]
-            },
-
-            formInputClass: {
-                "Personal": [['Name'], ['Institute'], ['Email'], ['DOB'], ['Address']],
-                "Education": [['Degree'], ['University'], ['Year'], ['Cpi']],
-                "Skills": [['Expertise'], ['YourExpertise']],
-                "Intern": [['Intern'], ['InternInfo'], ['InternDuration', 'Team']],
-                "Projects": [['Project', 'Guide'], ['ProjectInfo'], ['ProjectDuration', 'Team']],
-                "Responsibility": [['Pos']],
-                "Hobbies": [['Hobby']]
-            }
         }
 
         this.sections = ["Personal", "Education", "Skills", "Intern", "Projects", "Responsibility", "Hobbies"];
 
-        this.handleSelect();
+        this.handleSelectDropDownMenu();
     }
 
+
     createElement(tagName, classNames){
-        const TAG = document.createElement(tagName);
+
+        const htmlTag = document.createElement(tagName);
 
         if(classNames){
 
             classNames.forEach(function(className){
-                TAG.classList.add(className);
+                htmlTag.classList.add(className);
             });
         }
 
-        return TAG;
+        return htmlTag;
     }
 
     createText(text){
@@ -145,23 +173,104 @@ class View {
         return document.querySelectorAll(selector);
     }
 
-    displayResume(lists){
-        this.sections.forEach((sectionName, index) => {
+    createTable = (lists, sectionName, sectionHeading) => {
+        const table = this.createElement("table");
+        const thead = this.createElement('thead');
+        const tbody = this.createElement("tbody");
 
-            while(this.sectionsAndForms[sectionName].firstChild){
-                this.sectionsAndForms[sectionName].removeChild(this.sectionsAndForms[sectionName].firstChild);
-            }
-            while(this.sectionsAndDivs[sectionName].firstChild){
-                this.sectionsAndDivs[sectionName].removeChild(this.sectionsAndDivs[sectionName].firstChild);
-            }
-        })
+        if(typeof this.sectionMapping.headings[sectionName] !== 'undefined'){
+            const tr = this.createElement('tr');
 
-        while(this.container.firstChild){
-            this.container.removeChild(this.container.firstChild);
+            thead.appendChild(tr);
+
+            this.sectionMapping.headings[sectionName].forEach((heading, index) => {
+                const th = this.createElement("th", [this.sectionMapping.colClasses[sectionName][index]]);
+                th.appendChild(this.createText(heading));
+                tr.appendChild(th);
+            })
         }
 
-        // for forms
+        lists[sectionName].forEach(entries => {
+            const tr = this.createElement("tr");
+
+            entries.forEach((cols, colsIndex) => {
+                const td = this.createElement("td", [this.sectionMapping.colClasses[sectionName][colsIndex]]);
+                
+                cols.forEach((col, colIndex) => {
+                    const div = this.createElement("div");
+                    div.appendChild(this.createText(col));
+                    td.appendChild(div);
+                })
+
+                tr.appendChild(td);
+            });
+            
+            tbody.appendChild(tr);
+        })
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+
+        this.sectionsAndDivs[sectionName].appendChild(sectionHeading);
+        this.sectionsAndDivs[sectionName].appendChild(table);
+    }
+
+    createUnorderedLists = (lists, sectionName, sectionHeading) => {
+
+        const ul = this.createElement("ul");
+        lists[sectionName].forEach(entries => {
+
+            entries.forEach(cols => {
+                
+                cols.forEach((text) => {
+                    const li = this.createElement("li");
+                    li.appendChild(this.createText(text));
+
+                    ul.appendChild(li);                            
+                })
+            })
+        })
+
+        const div = this.createElement("div");
+
+        div.appendChild(sectionHeading);
+        div.appendChild(ul);
+
+        this.sectionsAndDivs[sectionName].appendChild(div);
+    }
+
+    createPersonalSection = (lists, sectionName, sectionHeading) => {
+
+        const img = this.createElement("img");
+        img.src = "https://daiict-placement-cell.github.io/ResumeMaker/img/daiictlogo.jpg";
+        this.sectionsAndDivs[sectionName].appendChild(img);
+
+        const div = this.createElement("div", ["flexItem"]);
+
+        lists[sectionName].forEach((entries) => {
+
+            entries.forEach((cols, colsIndex) => {
+                cols.forEach((row, rowIndex) => {
+                    
+                    const h = this.createElement(this.sectionMapping.tags[sectionName][colsIndex]);
+                    h.appendChild(this.createText(this.sectionMapping.formLableNames[sectionName].columns[colsIndex].rows[rowIndex].toUpperCase()));
+                    h.appendChild(this.createText(row));
+
+                    div.appendChild(h);
+                })
+            })
+        })
+
+        this.sectionsAndDivs[sectionName].appendChild(div);
+    }
+
+    createForm(lists){
+
+        const select = this.getElement("#DropdownSelect");
+        const sectionName = select.value;
+
         this.sections.forEach((sectionName, sectionIndex) => {
+
             const buttonDiv = this.createElement("div", ["newFlex2"]);
             const addButton = this.createElement("button", ["buttonClass", sectionName + "AddButton"]);
             addButton.appendChild(this.createText("Add"));
@@ -171,26 +280,24 @@ class View {
                 
                 const form = this.createElement("div", [sectionName + "Form", "Padding", "formClass"]);
 
-                entries.forEach((cols, outIndex) => {
+                entries.forEach((cols, colsIndex) => {
                     
-                    cols.forEach((col, colIndex) => {
+                    cols.forEach((row, rowIndex) => {
                         const label = this.createElement("label");
-                        label.appendChild(this.createText(this.factory.formLableNames[sectionName][outIndex][colIndex]));
+                        label.appendChild(this.createText(this.sectionMapping.formLableNames[sectionName].columns[colsIndex].rows[rowIndex]));
                         
-                        const input = this.createElement("input", [this.factory.formInputClass[sectionName][outIndex][colIndex]]);
-                        input.value = col;
+                        const input = this.createElement("input", [this.sectionMapping.formInputClass[sectionName].columns[colsIndex].rows[rowIndex]]);
+                        input.value = row;
                         
                         form.appendChild(label);
                         form.appendChild(input);
                     })
                     
-                    if(sectionName === "Education" && entryIndex === 0){
-                        form.style.display = "none";
-                    }
                 })
 
-                const this1 = this;
+                const viewContext = this;
                 const buttonDiv = this.createElement("div", ["newFlex"]);
+
                 const resetButton = this.createElement("button", ["buttonClass", sectionName + "ResetButton"]);
                 const updateButton = this.createElement("button", ["buttonClass", sectionName + "UpdateButton"]);
                 const removeButton = this.createElement("button", ["buttonClass", sectionName + "RemoveButton"]);
@@ -206,126 +313,61 @@ class View {
 
                     let indexOfButton = entryIndex;
 
-                    lists[sectionName][indexOfButton].forEach((cols, index) => {
-                        cols.forEach((col, colIndex) => {
-                            const inputs = this1.getElements("." + this1.factory.formInputClass[sectionName][index][colIndex]);
+                    lists[sectionName][indexOfButton].forEach((cols, colsIndex) => {
+                        cols.forEach((row, rowIndex) => {
+                            const inputs = viewContext.getElements("." + viewContext.sectionMapping.formInputClass[sectionName].columns[colsIndex].rows[rowIndex]);
                             const input = inputs[indexOfButton];
                             
-                            input.value = col;
+                            input.value = row;
                         })
                     })
                 })
                 
-                if(sectionName !== "Personal") {
-                    buttonDiv.appendChild(removeButton);
-                }
-                
+                this.sectionMapping.isStatic[sectionName] ? '' : buttonDiv.appendChild(removeButton);
                 form.appendChild(buttonDiv);
-                
                 this.sectionsAndForms[sectionName].append(form);
             })
-            
-            if(sectionName !== "Personal") this.sectionsAndForms[sectionName].append(buttonDiv);
-        })
-        
-        // for resume
-        this.sections.forEach((sectionName, sectionIndex) => {
-            const heading = this.createElement("h2");
-            heading.appendChild(this.createText(sectionName.toUpperCase()));
 
-            if(sectionName === "Personal"){
-                const img = this.createElement("img");
-                img.src = "https://daiict-placement-cell.github.io/ResumeMaker/img/daiictlogo.jpg";
-                this.sectionsAndDivs[sectionName].appendChild(img);
-
-                const div = this.createElement("div", ["flexItem"]);
-
-                lists[sectionName].forEach((entries) => {
-
-                    entries.forEach((cols, colsIndex) => {
-                        cols.forEach((col, colIndex) => {
-                            if(colsIndex === 0){
-                                const h1 = this.createElement("h1");
-                                h1.appendChild(this.createText(col));
-                                div.appendChild(h1);
-                            }
-                            else{
-                                const h3 = this.createElement("h3");
-
-                                if(colsIndex > 1){
-                                    h3.appendChild(this.createText(this.factory.formLableNames[sectionName][colsIndex][colIndex].toUpperCase()));
-                                }
-
-                                h3.appendChild(this.createText(col));
-                                div.appendChild(h3);
-                            }    
-                        })
-                    })
-                })
-
-                this.sectionsAndDivs[sectionName].appendChild(div);
-            }
-            else if(sectionName === "Responsibility" || sectionName === "Hobbies"){
-                const ul = this.createElement("ul");
-
-                lists[sectionName].forEach(entries => {
-
-                    entries.forEach(cols => {
-                        
-                        cols.forEach((text) => {
-                            const li = this.createElement("li");
-                            li.appendChild(this.createText(text));
-
-                            ul.appendChild(li);                            
-                        })
-
-                    })
-                })
-
-                const div = this.createElement("div");
-
-                div.appendChild(heading);
-                div.appendChild(ul);
-
-                this.sectionsAndDivs[sectionName].appendChild(div);
-            }
-            else{
-                const table = this.createElement("table");
-                const tbody = this.createElement("tbody");
-
-                lists[sectionName].forEach(entries => {
-                    const tr = this.createElement("tr");
-
-                    entries.forEach((cols, colsIndex) => {
-                        const td = this.createElement("td", [this.factory.colClasses[sectionName][colsIndex]]);
-                        
-                        cols.forEach((col, colIndex) => {
-                            const div = this.createElement("div");
-                            div.appendChild(this.createText(col));
-                            td.appendChild(div);
-                        })
-
-                        tr.appendChild(td);
-                    });
-                    
-                    tbody.appendChild(tr);
-                })
-
-                table.appendChild(tbody);
-
-                this.sectionsAndDivs[sectionName].appendChild(heading);
-                this.sectionsAndDivs[sectionName].appendChild(table);
-            }
-
-            this.container.append(this.sectionsAndDivs[sectionName]);
-
-            if(sectionIndex < 5){
-                this.container.append(this.createElement("div", ["borderBottom"]));
-            }
+            this.sectionMapping.isStatic[sectionName] ? '' : this.sectionsAndForms[sectionName].append(buttonDiv);
         })
     }
 
-    handleSelect = () => {
+    createResume(lists){
+        this.sections.forEach(sectionName => {
+
+            const heading = this.createElement("h2");
+            heading.appendChild(this.createText(sectionName.toUpperCase()));
+
+            this.sectionMapping.type[sectionName](lists, sectionName, heading);
+            this.container.append(this.sectionsAndDivs[sectionName]);
+
+            (this.sectionMapping.doesHaveABorder[sectionName]) ? this.container.append(this.createElement("div", ["borderBottom"])) : ''; 
+        })
+    }
+
+    deleteUntillEmptyParent(parent){
+
+        while(parent.firstChild){
+            parent.removeChild(parent.firstChild);
+        }
+    }
+
+    displayResume(lists){
+        this.sections.forEach(sectionName => {
+            this.deleteUntillEmptyParent(this.sectionsAndForms[sectionName]);
+            this.deleteUntillEmptyParent(this.sectionsAndDivs[sectionName]);
+        })
+
+        this.deleteUntillEmptyParent(this.container);
+
+        // for forms
+        this.createForm(lists);        
+        
+        // for resume
+        this.createResume(lists);        
+    }
+
+    handleSelectDropDownMenu = () => {
 
         this.sections.forEach(id => {
             const form = this.getElement("." + id.toLowerCase() + "Forms");
@@ -333,17 +375,15 @@ class View {
         })
 
         const select = this.getElement("#DropdownSelect");
-        const this1 = this;
+        const viewContext = this;
         let previousSection = select.value;
 
         select.addEventListener("change", function(){
             const currentSection = this.value;
-            const form = this1.getElement("." + currentSection.toLowerCase() + "Forms");
-
-            // console.log(previousSection, section);
+            const form = viewContext.getElement("." + currentSection.toLowerCase() + "Forms");
 
             if(previousSection !== "Select") {
-                this1.getElement("." + previousSection.toLowerCase() + "Forms").style.display = "none";
+                viewContext.getElement("." + previousSection.toLowerCase() + "Forms").style.display = "none";
             }
             form.style.display = "block";
 
@@ -358,16 +398,17 @@ class View {
             const forms = this.getElements("." + sectionName + "Form");
             
             updateButtons.forEach((button, indexOfContentToBeUpdated) => {
-                const this1 = this;
+                const viewContext = this;
                 
                 button.addEventListener("click", function(){
                     const updatedRowContent = [];
 
-                    this1.factory.formInputClass[sectionName].forEach((cols) => {
+                    viewContext.sectionMapping.formInputClass[sectionName].columns.forEach(cols => {
+
                         const colContent = [];
 
-                        cols.forEach((col) => {
-                            const inputs = this1.getElements("." + col);
+                        cols.rows.forEach((inputClass, index) => {
+                            const inputs = viewContext.getElements("." + inputClass);
                             colContent.push(inputs[indexOfContentToBeUpdated].value);
                         })
 
@@ -387,7 +428,6 @@ class View {
 
             removeButtons.forEach((button, indexOfContentToBeUpdated) => {
                 const inputs = forms[indexOfContentToBeUpdated].getElementsByTagName("input");
-                const this1 = this;
 
                 button.addEventListener("click", function(){
                     handler(sectionName, indexOfContentToBeUpdated);
@@ -401,23 +441,21 @@ class View {
             if(sectionName === "Personal") {
                 return ;
             }
-            
-            // console.log(sectionName);
 
             const addButton = this.getElement("." + sectionName + "AddButton");
-            const this1 = this;
+            const viewContext = this;
 
             addButton.addEventListener("click", function(){
-                const form = this1.createElement("div", [sectionName + "Form", "Padding", "formClass"]);
+                const form = viewContext.createElement("div", [sectionName + "Form", "Padding", "formClass"]);
                 this.style.display = "none";
 
-                this1.factory.formInputClass[sectionName].forEach((cols) => {
+                viewContext.sectionMapping.formInputClass[sectionName].columns.forEach(cols => {
 
-                    cols.forEach((col) => {
-                        const label = this1.createElement("label");
-                        label.appendChild(this1.createText(col));
+                    cols.rows.forEach((row) => {
+                        const label = viewContext.createElement("label");
+                        label.appendChild(viewContext.createText(row));
 
-                        const input = this1.createElement("input", [col]);
+                        const input = viewContext.createElement("input", [row]);
                         input.value = "";
 
                         form.appendChild(label);
@@ -425,23 +463,23 @@ class View {
                     })
                 })
 
-                const buttonDiv = this1.createElement("div", ["newFlex2"]);
-                const submitButton = this1.createElement("button");
-                submitButton.appendChild(this1.createText("submit"));
+                const buttonDiv = viewContext.createElement("div", ["newFlex2"]);
+                const submitButton = viewContext.createElement("button");
+                submitButton.appendChild(viewContext.createText("submit"));
                 buttonDiv.appendChild(submitButton);
                 form.appendChild(buttonDiv);
 
-                this1.sectionsAndForms[sectionName].append(form);
+                viewContext.sectionsAndForms[sectionName].append(form);
                 const newContent = [];
                 let counter = 0;
 
                 submitButton.addEventListener("click", function(){
-                    // console.log();
-                    this1.factory.formInputClass[sectionName].forEach((cols) => {
+                    
+                    viewContext.sectionMapping.formInputClass[sectionName].columns.forEach((cols) => {
                         const colContent = [];
 
-                        cols.forEach((col) => {
-                            const columns = this1.getElements("." + col);
+                        cols.rows.forEach((inputClass) => {
+                            const columns = viewContext.getElements("." + inputClass);
                             colContent.push(columns[columns.length - 1].value);
                         })
 
